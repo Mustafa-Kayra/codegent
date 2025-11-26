@@ -949,18 +949,18 @@ console.log('Hello from Codegent!');
    * Format the response with code changes summary
    */
   private formatResponse(_analysis: CommandAnalysis, codeChanges: CodeChange[]): string {
-    let response = `I've processed your request and generated the following files:\\n\\n`;
+    let response = `I've processed your request and generated the following files:\n\n`;
 
     for (const change of codeChanges) {
       const stats = `+${change.linesAdded} -${change.linesRemoved} lines`;
-      response += `📄 **${change.fileName}** (${change.language}) - ${change.action}d\\n`;
-      response += `   ${stats}\\n\\n`;
+      response += `📄 **${change.fileName}** (${change.language}) - ${change.action}d\n`;
+      response += `   ${stats}\n\n`;
     }
 
     const totalAdded = codeChanges.reduce((sum, c) => sum + c.linesAdded, 0);
     const totalRemoved = codeChanges.reduce((sum, c) => sum + c.linesRemoved, 0);
 
-    response += `\\n**Total changes:** +${totalAdded} -${totalRemoved} lines across ${codeChanges.length} file(s)`;
+    response += `\n**Total changes:** +${totalAdded} -${totalRemoved} lines across ${codeChanges.length} file(s)`;
 
     return response;
   }

@@ -131,7 +131,7 @@ function MessageBubble({ message }: MessageBubbleProps) {
         </span>
       </div>
       <div className="message-content">
-        {message.content.split('\\n').map((line, i) => (
+        {message.content.split('\n').map((line, i) => (
           <p key={i}>{line}</p>
         ))}
       </div>
