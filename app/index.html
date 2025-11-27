@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Codegent - AI-Powered Code Editor</title>
+
+    <!-- CDN Bağımlılıkları -->
+    <!-- Puter.js - Dynamic service, no static integrity available -->
+    <script src="https://js.puter.com/v2/"></script>
+    <!-- TailwindCSS - Dynamic build, no static integrity available -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.294.0/dist/umd/lucide.min.js" integrity="sha384-RvXv+J4BXrlVhPQR7A/w4LQ+RhGCvGZUW6Qk5xVJvYnOvvW3CyOJxNJfFW7zUhRM" crossorigin="anonymous"></script>
+    <!-- Marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js" integrity="sha384-DLGMjbI5FXuJMOBG3GYJJx8xTIcL4zIjX/2s5CInOuNqTh1I7x4xKpFN0pjLBP/Z" crossorigin="anonymous"></script>
+    
+    <!-- Monaco Editor CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js" integrity="sha512-A+6SvPsZxeC7DGoZd/1SZGBXP/g9yPOVyPzKPqVt06rNuEpLnMCNDSBT8LqBl6FzPXwJZMnYy9BtM7z6E/KGAQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- JSZip for project download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Harici CSS Dosyası -->
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="h-screen flex flex-col overflow-hidden bg-[#0f111a] text-white">
+    <!-- Top Bar / Header -->
+    <header class="h-12 border-b border-[#2f3345] bg-[#0f111a] flex items-center justify-between px-4 flex-shrink-0">
+        <!-- Sol: Logo ve Başlık -->
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <i data-lucide="code-2" class="w-5 h-5 text-white"></i>
+            </div>
+            <span class="font-bold text-lg hidden sm:block">Codegent</span>
+        </div>
+
+        <!-- Orta: Model Seçici -->
+        <div class="flex items-center gap-3">
+            <select id="model-selector" class="bg-[#1e2130] border border-[#2f3345] text-sm text-gray-200 rounded-lg px-3 py-1.5 focus:ring-1 focus:ring-blue-500 outline-none max-w-[200px]">
+                <optgroup label="🔥 2025 Flagships">
+                    <option value="openrouter:openai/gpt-5.1">GPT 5.1 (Preview)</option>
+                    <option value="openrouter:anthropic/claude-opus-4.5">Claude Opus 4.5</option>
+                    <option value="openrouter:google/gemini-3">Gemini 3 Ultra</option>
+                    <option value="openrouter:x-ai/grok-3">Grok 3</option>
+                    <option value="openrouter:deepseek/deepseek-r1">DeepSeek R1</option>
+                </optgroup>
+                <optgroup label="🧠 Anthropic Claude">
+                    <option value="claude-sonnet-4" selected>Claude Sonnet 4 (Native)</option>
+                    <option value="openrouter:anthropic/claude-3.7-sonnet">Claude 3.7 Sonnet</option>
+                    <option value="openrouter:anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                    <option value="openrouter:anthropic/claude-opus-4.1">Claude Opus 4.1</option>
+                    <option value="openrouter:anthropic/claude-haiku-4.5">Claude Haiku 4.5</option>
+                </optgroup>
+                <optgroup label="✨ OpenAI GPT">
+                    <option value="gpt-4o">GPT-4o (Native)</option>
+                    <option value="openrouter:openai/gpt-5">GPT 5</option>
+                    <option value="openrouter:openai/gpt-4o">GPT-4o</option>
+                    <option value="openrouter:openai/o3">OpenAI o3</option>
+                    <option value="openrouter:openai/o3-deep-research">o3 Deep Research</option>
+                    <option value="openrouter:openai/gpt-5-image">GPT-5 Image</option>
+                </optgroup>
+                <optgroup label="⚡ Google Gemini">
+                    <option value="gemini-3-pro-preview">Gemini 3 Pro (Native)</option>
+                    <option value="openrouter:google/gemini-2.5-pro">Gemini 2.5 Pro</option>
+                    <option value="openrouter:google/gemini-2.5-flash-preview-09-2025">Gemini 2.5 Flash</option>
+                </optgroup>
+                <optgroup label="🌌 xAI Grok">
+                    <option value="openrouter:x-ai/grok-4.1-fast">Grok 4.1 Fast</option>
+                    <option value="openrouter:x-ai/grok-4">Grok 4</option>
+                    <option value="openrouter:x-ai/grok-2-1212">Grok 2</option>
+                </optgroup>
+                <optgroup label="🚀 DeepSeek & Çin">
+                    <option value="openrouter:deepseek/deepseek-chat-v3.1">DeepSeek V3.1</option>
+                    <option value="openrouter:deepseek/deepseek-v3.2-exp">DeepSeek V3.2 Exp</option>
+                    <option value="openrouter:moonshotai/kimi-k2-thinking">Kimi k2 Thinking</option>
+                    <option value="openrouter:z-ai/glm-4.6">GLM 4.6</option>
+                </optgroup>
+                <optgroup label="📚 Diğer Modeller">
+                    <option value="openrouter:meta-llama/llama-4-maverick">Llama 4 Maverick</option>
+                    <option value="openrouter:meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B</option>
+                    <option value="openrouter:qwen/qwen-2.5-72b-instruct">Qwen 2.5 72B</option>
+                    <option value="openrouter:mistralai/mistral-large-2411">Mistral Large 2411</option>
+                    <option value="openrouter:perplexity/sonar-reasoning-pro">Perplexity Sonar Pro</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <!-- Sağ: Kullanıcı ve Ayarlar -->
+        <div class="flex items-center gap-2">
+            <!-- Deploy Butonu -->
+            <button id="deploy-btn" onclick="deployProject()" class="hidden sm:flex bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1.5 rounded-lg items-center gap-2 transition-colors">
+                <i data-lucide="rocket" class="w-4 h-4"></i>
+                <span id="deploy-btn-text">Deploy</span>
+            </button>
+
+            <!-- Proje İndir -->
+            <button onclick="downloadProject()" class="p-2 hover:bg-[#1e2130] rounded-lg transition-colors" title="Proje İndir (ZIP)">
+                <i data-lucide="download" class="w-5 h-5 text-gray-400"></i>
+            </button>
+
+            <!-- Ayarlar -->
+            <button onclick="toggleSettings()" class="p-2 hover:bg-[#1e2130] rounded-lg transition-colors" title="Ayarlar">
+                <i data-lucide="settings" class="w-5 h-5 text-gray-400"></i>
+            </button>
+
+            <!-- Kullanıcı -->
+            <div class="flex items-center gap-2 ml-2 cursor-pointer" onclick="handleAuth()">
+                <div id="user-avatar" class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-sm font-bold">?</div>
+                <span id="username" class="text-sm text-gray-300 hidden sm:block">Misafir</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex overflow-hidden">
+        <!-- Sol Panel: Dosya Ağacı -->
+        <aside id="file-panel" class="w-64 border-r border-[#2f3345] bg-[#0f111a] flex flex-col flex-shrink-0 overflow-hidden">
+            <!-- Dosya Paneli Başlık -->
+            <div class="p-3 border-b border-[#2f3345] flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400" id="files-title">Dosyalar</span>
+                <div class="flex items-center gap-1">
+                    <button onclick="createNewFile()" class="p-1 hover:bg-[#1e2130] rounded transition-colors" title="Yeni Dosya">
+                        <i data-lucide="file-plus" class="w-4 h-4 text-gray-400"></i>
+                    </button>
+                    <button onclick="createNewFolder()" class="p-1 hover:bg-[#1e2130] rounded transition-colors" title="Yeni Klasör">
+                        <i data-lucide="folder-plus" class="w-4 h-4 text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Dosya Ağacı -->
+            <div id="file-tree" class="flex-1 overflow-y-auto p-2 text-sm">
+                <!-- Dosyalar buraya JS ile eklenecek -->
+            </div>
+        </aside>
+
+        <!-- Orta Panel: Monaco Editor -->
+        <section class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <!-- Tab Bar -->
+            <div id="tab-bar" class="h-10 bg-[#151722] border-b border-[#2f3345] flex items-center px-2 overflow-x-auto scrollbar-hide">
+                <!-- Sekmeler buraya JS ile eklenecek -->
+            </div>
+            <!-- Monaco Editor Container -->
+            <div id="editor-container" class="flex-1 overflow-hidden"></div>
+        </section>
+
+        <!-- Sağ Panel: Canlı Önizleme -->
+        <aside id="preview-panel" class="w-96 border-l border-[#2f3345] bg-[#0f111a] flex flex-col flex-shrink-0 overflow-hidden">
+            <!-- Önizleme Başlık -->
+            <div class="p-3 border-b border-[#2f3345] flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400" id="preview-title">Canlı Önizleme</span>
+                <div class="flex items-center gap-1">
+                    <button onclick="refreshPreview()" class="p-1 hover:bg-[#1e2130] rounded transition-colors" title="Yenile">
+                        <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-400"></i>
+                    </button>
+                    <button onclick="togglePreviewPanel()" class="p-1 hover:bg-[#1e2130] rounded transition-colors" title="Paneli Kapat">
+                        <i data-lucide="x" class="w-4 h-4 text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Önizleme iframe -->
+            <div class="flex-1 bg-white overflow-hidden">
+                <iframe id="preview-frame" class="w-full h-full border-0" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Alt Panel: AI Sohbet -->
+    <aside id="chat-panel" class="h-72 border-t border-[#2f3345] bg-[#0f111a] flex flex-col flex-shrink-0">
+        <!-- Sohbet Başlık -->
+        <div class="h-10 px-4 border-b border-[#2f3345] flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i data-lucide="bot" class="w-4 h-4 text-blue-400"></i>
+                <span class="text-sm font-medium" id="ai-chat-title">AI Asistan</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <!-- Dil Seçici -->
+                <select id="language-selector" class="bg-[#1e2130] border border-[#2f3345] text-xs text-gray-300 rounded px-2 py-1 outline-none">
+                    <option value="tr">🇹🇷 TR</option>
+                    <option value="en">🇺🇸 EN</option>
+                    <option value="zh">🇨🇳 中文</option>
+                    <option value="es">🇪🇸 ES</option>
+                    <option value="ar">🇸🇦 AR</option>
+                    <option value="hi">🇮🇳 HI</option>
+                    <option value="pt">🇧🇷 PT</option>
+                    <option value="ru">🇷🇺 RU</option>
+                    <option value="ja">🇯🇵 JA</option>
+                    <option value="de">🇩🇪 DE</option>
+                    <option value="fr">🇫🇷 FR</option>
+                    <option value="ko">🇰🇷 KO</option>
+                    <option value="it">🇮🇹 IT</option>
+                    <option value="vi">🇻🇳 VI</option>
+                    <option value="fa">🇮🇷 FA</option>
+                    <option value="pl">🇵🇱 PL</option>
+                    <option value="uk">🇺🇦 UK</option>
+                    <option value="ro">🇷🇴 RO</option>
+                    <option value="nl">🇳🇱 NL</option>
+                    <option value="th">🇹🇭 TH</option>
+                </select>
+                <!-- Stil Seçici -->
+                <select id="style-selector" class="bg-[#1e2130] border border-[#2f3345] text-xs text-gray-300 rounded px-2 py-1 outline-none">
+                    <option value="normal">Normal</option>
+                    <option value="genz">Z Kuşağı 🔥</option>
+                    <option value="academic">Akademik 📚</option>
+                    <option value="friendly">Samimi 😊</option>
+                </select>
+                <!-- Panel Toggle -->
+                <button onclick="toggleChatPanel()" class="p-1 hover:bg-[#1e2130] rounded transition-colors">
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400" id="chat-toggle-icon"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Sohbet Mesajları -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <!-- Mesajlar buraya eklenecek -->
+            <div class="text-center text-gray-500 text-sm py-8">
+                <i data-lucide="message-square" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                <p id="chat-empty-text">Kod hakkında soru sorun veya AI'dan yardım isteyin</p>
+            </div>
+        </div>
+        <!-- Sohbet Input -->
+        <div class="p-3 border-t border-[#2f3345]">
+            <div class="flex items-center gap-2 bg-[#1e2130] rounded-xl px-3 py-2 border border-[#2f3345] focus-within:border-[#3b52d4]">
+                <input type="text" id="chat-input" class="flex-1 bg-transparent text-sm outline-none" placeholder="Bir şeyler sor..." />
+                <button onclick="sendChatMessage()" class="p-2 bg-[#3b52d4] hover:bg-[#2e42b5] rounded-lg transition-colors">
+                    <i data-lucide="send" class="w-4 h-4 text-white"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Ayarlar Modal -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1e2130] rounded-2xl border border-[#2f3345] w-full max-w-md p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-white" id="settings-title">Ayarlar</h3>
+                <button onclick="toggleSettings()" class="text-gray-400 hover:text-white p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <!-- Tema -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2" id="theme-label">Tema</label>
+                    <select id="theme-selector" class="w-full bg-[#151722] border border-[#2f3345] text-sm text-white p-3 rounded-lg outline-none">
+                        <option value="dark">Koyu</option>
+                        <option value="light">Açık</option>
+                    </select>
+                </div>
+                <!-- Font Size -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2" id="font-size-label">Yazı Boyutu</label>
+                    <input type="range" id="font-size-slider" min="12" max="24" value="14" class="w-full" />
+                    <span id="font-size-value" class="text-xs text-gray-400">14px</span>
+                </div>
+                <!-- Özel Model Ekle -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-2" id="custom-model-label">Özel Model Ekle</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="custom-model-input" class="flex-1 bg-[#151722] border border-[#2f3345] text-sm text-white p-2 rounded-lg outline-none" placeholder="openrouter:model/name" />
+                        <button onclick="addCustomModel()" class="bg-[#3b52d4] hover:bg-[#2e42b5] text-white px-3 rounded-lg text-sm">Ekle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yeni Dosya Modal -->
+    <div id="new-file-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1e2130] rounded-2xl border border-[#2f3345] w-full max-w-sm p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-white" id="new-file-title">Yeni Dosya</h3>
+                <button onclick="closeNewFileModal()" class="text-gray-400 hover:text-white p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <input type="text" id="new-file-name" class="w-full bg-[#151722] border border-[#2f3345] text-sm text-white p-3 rounded-lg outline-none mb-4" placeholder="dosya_adi.js" />
+            <button onclick="confirmNewFile()" class="w-full bg-[#3b52d4] hover:bg-[#2e42b5] text-white py-2 rounded-lg text-sm">Oluştur</button>
+        </div>
+    </div>
+
+    <!-- Harici JavaScript Dosyaları -->
+    <script src="languages.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

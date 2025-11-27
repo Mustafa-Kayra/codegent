@@ -1,0 +1,520 @@
+/**
+ * Codegent - AI-Powered Code Editor
+ * Stil Dosyası
+ * 
+ * İçerik:
+ * - CSS Değişkenleri
+ * - Genel Stiller
+ * - Monaco Editor Özelleştirmeleri
+ * - Dosya Ağacı Stilleri
+ * - Sohbet Paneli Stilleri
+ * - Responsive Tasarım
+ */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* CSS Değişkenleri - Dark Theme */
+:root {
+    --bg-app: #0f111a;
+    --bg-panel: #1e2130;
+    --bg-editor: #151722;
+    --bg-hover: #25283a;
+    --primary: #3b52d4;
+    --primary-hover: #2e42b5;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --text-main: #ffffff;
+    --text-muted: #9498a4;
+    --text-dim: #6b7280;
+    --border: #2f3345;
+    --border-focus: #3b52d4;
+    
+    /* Font Aileleri */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Monaco', monospace;
+    
+    /* Animasyon Süreleri */
+    --transition-fast: 0.15s;
+    --transition-normal: 0.25s;
+    
+    /* Safe Area Insets */
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Genel Reset ve Base Stiller */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Scrollbar Stilleri */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3e4359;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4f5473;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Select Stilleri */
+select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239498a4%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 0.6rem auto;
+    padding-right: 1.5rem;
+    cursor: pointer;
+}
+
+select option {
+    background: var(--bg-panel);
+    color: var(--text-main);
+}
+
+select optgroup {
+    background: var(--bg-panel);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* Focus Stilleri - Erişilebilirlik */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Buton Genel Stiller */
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+}
+
+/* Input Genel Stiller */
+input, textarea {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* =====================
+   DOSYA AĞACI STİLLERİ
+   ===================== */
+
+#file-tree {
+    font-size: 13px;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    user-select: none;
+}
+
+.file-item:hover {
+    background-color: var(--bg-hover);
+}
+
+.file-item.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+.file-item.active .file-icon {
+    color: white;
+}
+
+.file-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-actions {
+    display: none;
+    gap: 4px;
+}
+
+.file-item:hover .file-actions {
+    display: flex;
+}
+
+.file-action-btn {
+    padding: 2px;
+    border-radius: 4px;
+    color: var(--text-muted);
+    transition: all var(--transition-fast);
+}
+
+.file-action-btn:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Klasör İndentasyonu */
+.folder-children {
+    margin-left: 16px;
+    border-left: 1px solid var(--border);
+    padding-left: 8px;
+}
+
+/* =====================
+   TAB BAR STİLLERİ
+   ===================== */
+
+.editor-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: var(--bg-editor);
+    border-right: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.editor-tab:hover {
+    color: var(--text-main);
+    background-color: var(--bg-hover);
+}
+
+.editor-tab.active {
+    color: var(--text-main);
+    background-color: var(--bg-app);
+    border-bottom: 2px solid var(--primary);
+}
+
+.tab-close-btn {
+    padding: 2px;
+    border-radius: 4px;
+    color: var(--text-dim);
+    transition: all var(--transition-fast);
+}
+
+.tab-close-btn:hover {
+    color: white;
+    background-color: var(--error);
+}
+
+/* =====================
+   MONACO EDITOR STİLLERİ
+   ===================== */
+
+#editor-container {
+    font-family: var(--font-mono);
+}
+
+/* Monaco içindeki minimap stili */
+.monaco-editor .minimap {
+    opacity: 0.7;
+}
+
+/* =====================
+   SOHBET PANELİ STİLLERİ
+   ===================== */
+
+.chat-message {
+    display: flex;
+    gap: 12px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-message.user {
+    flex-direction: row-reverse;
+}
+
+.chat-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.chat-message.user .chat-avatar {
+    background: linear-gradient(135deg, #3b52d4, #8b5cf6);
+}
+
+.chat-message.assistant .chat-avatar {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border);
+}
+
+.chat-bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.chat-message.user .chat-bubble {
+    background: linear-gradient(135deg, #3b52d4, #2e42b5);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.chat-message.assistant .chat-bubble {
+    background-color: var(--bg-panel);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+}
+
+/* Markdown İçerik Stilleri */
+.chat-bubble p {
+    margin-bottom: 0.5em;
+}
+
+.chat-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+.chat-bubble pre {
+    background-color: var(--bg-app);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 8px 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
+.chat-bubble code {
+    font-family: var(--font-mono);
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.chat-bubble pre code {
+    background: none;
+    padding: 0;
+}
+
+/* Yükleniyor Göstergesi */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--text-muted);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* =====================
+   ÖNİZLEME PANELİ
+   ===================== */
+
+#preview-frame {
+    background-color: white;
+}
+
+/* =====================
+   MODAL STİLLERİ
+   ===================== */
+
+.modal-overlay {
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =====================
+   RESPONSIVE TASARIM
+   ===================== */
+
+@media (max-width: 1024px) {
+    /* Önizleme panelini gizle */
+    #preview-panel {
+        display: none;
+    }
+    
+    /* Sohbet paneli yüksekliğini azalt */
+    #chat-panel {
+        height: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Dosya panelini gizle (mobil menü ile açılabilir) */
+    #file-panel {
+        position: absolute;
+        left: 0;
+        top: 48px;
+        bottom: 0;
+        z-index: 20;
+        transform: translateX(-100%);
+        transition: transform var(--transition-normal);
+    }
+    
+    #file-panel.open {
+        transform: translateX(0);
+    }
+    
+    /* Header'da mobil menü butonu ekle */
+    .mobile-menu-btn {
+        display: flex !important;
+    }
+    
+    /* Tab bar'ı daha kompakt yap */
+    .editor-tab {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Çok küçük ekranlar için ek ayarlar */
+    #chat-panel {
+        height: 180px;
+    }
+    
+    header {
+        padding: 0 8px;
+    }
+}
+
+/* =====================
+   YARDİMCI SINIFLAR
+   ===================== */
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Reduced Motion Desteği */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print Stilleri */
+@media print {
+    #file-panel,
+    #preview-panel,
+    #chat-panel,
+    header {
+        display: none !important;
+    }
+    
+    #editor-container {
+        height: auto !important;
+    }
+}
