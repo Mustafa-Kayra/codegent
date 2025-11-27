@@ -1,0 +1,213 @@
+{
+  "name": "codegent-ai-agent",
+  "displayName": "Codegent AI Agent",
+  "description": "AI-powered code completion and chat - GitHub Copilot alternative with 33 AI models",
+  "version": "1.0.0",
+  "publisher": "mustafa-kayra",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Programming Languages",
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "copilot",
+    "code completion",
+    "gpt",
+    "claude",
+    "gemini",
+    "autocomplete",
+    "intellisense"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codegent.openChat",
+        "title": "Codegent: Open Chat"
+      },
+      {
+        "command": "codegent.explainCode",
+        "title": "Codegent: Explain Code"
+      },
+      {
+        "command": "codegent.refactorCode",
+        "title": "Codegent: Refactor Code"
+      },
+      {
+        "command": "codegent.fixCode",
+        "title": "Codegent: Fix Code"
+      },
+      {
+        "command": "codegent.generateTests",
+        "title": "Codegent: Generate Tests"
+      },
+      {
+        "command": "codegent.addComments",
+        "title": "Codegent: Add Comments"
+      },
+      {
+        "command": "codegent.compareModels",
+        "title": "Codegent: Compare Models"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codegent.explainCode",
+          "when": "editorHasSelection",
+          "group": "codegent@1"
+        },
+        {
+          "command": "codegent.refactorCode",
+          "when": "editorHasSelection",
+          "group": "codegent@2"
+        },
+        {
+          "command": "codegent.fixCode",
+          "when": "editorHasSelection",
+          "group": "codegent@3"
+        },
+        {
+          "command": "codegent.generateTests",
+          "when": "editorHasSelection",
+          "group": "codegent@4"
+        },
+        {
+          "command": "codegent.addComments",
+          "when": "editorHasSelection",
+          "group": "codegent@5"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "codegentChat",
+          "name": "AI Agent Chat",
+          "type": "webview"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Codegent AI Agent",
+      "properties": {
+        "codegent.model": {
+          "type": "string",
+          "default": "openrouter:openai/gpt-4o",
+          "description": "Default AI model to use",
+          "enum": [
+            "openrouter:openai/gpt-5.1",
+            "openrouter:openai/gpt-4.1",
+            "openrouter:openai/gpt-4o",
+            "openrouter:openai/gpt-4o-mini",
+            "openrouter:openai/o1",
+            "openrouter:openai/o3-mini",
+            "openrouter:anthropic/claude-opus-4.5",
+            "openrouter:anthropic/claude-sonnet-4",
+            "openrouter:anthropic/claude-3.5-sonnet",
+            "openrouter:google/gemini-3",
+            "openrouter:google/gemini-2.5-pro-preview",
+            "openrouter:x-ai/grok-3",
+            "openrouter:deepseek/deepseek-r1",
+            "openrouter:meta-llama/llama-4-maverick"
+          ]
+        },
+        "codegent.enableInlineCompletion": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Tab auto-completion"
+        },
+        "codegent.inlineCompletionDelay": {
+          "type": "number",
+          "default": 500,
+          "description": "Delay in milliseconds before showing inline completions"
+        },
+        "codegent.maxCompletionTokens": {
+          "type": "number",
+          "default": 256,
+          "description": "Maximum tokens for inline completion"
+        },
+        "codegent.language": {
+          "type": "string",
+          "default": "en",
+          "description": "UI Language",
+          "enum": [
+            "tr",
+            "en",
+            "zh",
+            "es",
+            "ar",
+            "hi",
+            "pt",
+            "ru",
+            "ja",
+            "de",
+            "fr",
+            "ko",
+            "it",
+            "vi",
+            "fa",
+            "pl",
+            "uk",
+            "ro",
+            "nl",
+            "th"
+          ]
+        },
+        "codegent.customModels": {
+          "type": "array",
+          "default": [],
+          "description": "Custom AI models to add"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "codegent.openChat",
+        "key": "ctrl+shift+c",
+        "mac": "cmd+shift+c"
+      },
+      {
+        "command": "codegent.explainCode",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "editorHasSelection"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "webpack --mode production",
+    "watch": "webpack --mode development --watch",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "marked": "^11.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mustafa-Kayra/codegent"
+  },
+  "license": "MIT"
+}

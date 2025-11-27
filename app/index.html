@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codegent - AI-Powered Code Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-box">
+      <div class="login-logo">🔷 Codegent</div>
+      <p class="login-subtitle" data-i18n="askAnything">AI-Powered Code Editor</p>
+      <button class="btn btn-primary login-btn" onclick="login()">
+        <i data-lucide="log-in"></i>
+        <span data-i18n="login">Login with Puter</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="hidden">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="btn btn-icon btn-ghost" id="sidebar-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="logo">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 17L12 22L22 17" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366f1"/>
+                <stop offset="0.5" stop-color="#8b5cf6"/>
+                <stop offset="1" stop-color="#ec4899"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          Codegent
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="select-wrapper">
+          <select id="model-select" class="select" onchange="onModelChange(this.value)">
+            <!-- Models will be populated by JS -->
+          </select>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="btn btn-secondary" id="compare-btn" onclick="toggleCompareMode()">
+          <i data-lucide="columns"></i>
+          <span data-i18n="compare">Compare</span>
+        </button>
+        <button class="btn btn-primary" id="deploy-btn" onclick="deployProject()">
+          <i data-lucide="rocket"></i>
+          <span data-i18n="deploy">Deploy</span>
+        </button>
+        
+        <!-- Language Selector -->
+        <div class="language-dropdown">
+          <button class="language-btn" onclick="toggleLanguageDropdown()">
+            <span id="current-lang-flag">🇺🇸</span>
+          </button>
+          <div id="language-list" class="language-list">
+            <!-- Languages will be populated by JS -->
+          </div>
+        </div>
+        
+        <!-- Settings -->
+        <button class="btn btn-icon btn-ghost" onclick="openSettings()">
+          <i data-lucide="settings"></i>
+        </button>
+        
+        <!-- User Menu -->
+        <div class="user-menu">
+          <div class="user-avatar" onclick="toggleUserMenu()" id="user-avatar">U</div>
+          <div class="user-dropdown" id="user-dropdown">
+            <div class="user-dropdown-item" onclick="openImageGallery()">
+              <i data-lucide="image"></i>
+              <span data-i18n="imageGallery">Image Gallery</span>
+            </div>
+            <div class="user-dropdown-item" onclick="openSettings()">
+              <i data-lucide="settings"></i>
+              <span data-i18n="settings">Settings</span>
+            </div>
+            <div class="user-dropdown-divider"></div>
+            <div class="user-dropdown-item" onclick="logout()">
+              <i data-lucide="log-out"></i>
+              <span data-i18n="logout">Logout</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Sidebar - Files -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-title" data-i18n="files">Files</span>
+          <button class="btn btn-icon btn-ghost" onclick="createNewFile()">
+            <i data-lucide="plus"></i>
+          </button>
+        </div>
+        <div class="sidebar-content">
+          <div id="file-tree" class="file-tree">
+            <!-- File tree will be populated by JS -->
+          </div>
+        </div>
+        <div class="sidebar-header" style="border-top: 1px solid var(--border-color); border-bottom: none;">
+          <span class="sidebar-title" data-i18n="templates">Projects</span>
+          <button class="btn btn-icon btn-ghost" onclick="createNewProject()">
+            <i data-lucide="folder-plus"></i>
+          </button>
+        </div>
+        <div class="sidebar-content" style="max-height: 200px;">
+          <div id="project-list" class="file-tree">
+            <!-- Projects will be populated by JS -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Editor Panel -->
+      <main class="editor-panel">
+        <div class="editor-tabs" id="editor-tabs">
+          <!-- Tabs will be populated by JS -->
+        </div>
+        <div class="editor-container" id="editor-container">
+          <div id="monaco-editor"></div>
+        </div>
+      </main>
+
+      <!-- Preview Panel -->
+      <aside class="preview-panel" id="preview-panel">
+        <div class="preview-header">
+          <span class="preview-title">
+            <i data-lucide="eye"></i>
+            <span data-i18n="preview">Preview</span>
+          </span>
+          <div class="preview-actions">
+            <button class="btn btn-icon btn-ghost" onclick="refreshPreview()">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+            <button class="btn btn-icon btn-ghost" onclick="openPreviewInNewTab()">
+              <i data-lucide="external-link"></i>
+            </button>
+          </div>
+        </div>
+        <iframe id="preview-frame" class="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+      </aside>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel" id="chat-panel">
+      <div class="chat-header">
+        <div class="chat-title">
+          <i data-lucide="message-square"></i>
+          <span data-i18n="chat">AI Chat</span>
+        </div>
+        <button class="btn btn-icon btn-ghost chat-toggle" onclick="toggleChatPanel()">
+          <i data-lucide="chevron-down" id="chat-toggle-icon"></i>
+        </button>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <!-- Messages will be populated by JS -->
+      </div>
+      <div class="chat-input-container">
+        <button class="btn btn-icon btn-ghost" onclick="uploadImage()">
+          <i data-lucide="paperclip"></i>
+        </button>
+        <div class="chat-input-wrapper">
+          <textarea 
+            id="chat-input" 
+            class="chat-input" 
+            placeholder="Ask me anything..." 
+            data-i18n-placeholder="askAnything"
+            rows="1"
+            onkeydown="handleChatKeydown(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+        </div>
+        <button class="chat-send-btn" id="chat-send-btn" onclick="sendMessage()">
+          <i data-lucide="send"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Compare Panel -->
+    <div class="compare-panel" id="compare-panel">
+      <div class="compare-header">
+        <h3 data-i18n="compare">Side by Side Comparison</h3>
+        <button class="btn btn-icon btn-ghost" onclick="toggleCompareMode()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="compare-body">
+        <div class="compare-column">
+          <div class="compare-column-header">
+            <select id="compare-model-1" class="select">
+              <!-- Models will be populated by JS -->
+            </select>
+          </div>
+          <div class="compare-column-content" id="compare-result-1">
+            <!-- Result will be shown here -->
+          </div>
+        </div>
+        <div class="compare-column">
+          <div class="compare-column-header">
+            <select id="compare-model-2" class="select">
+              <!-- Models will be populated by JS -->
+            </select>
+          </div>
+          <div class="compare-column-content" id="compare-result-2">
+            <!-- Result will be shown here -->
+          </div>
+        </div>
+      </div>
+      <div class="compare-input-container">
+        <textarea id="compare-input" class="compare-input" placeholder="Enter prompt for both models..." rows="3"></textarea>
+        <button class="btn btn-primary" onclick="runComparison()">
+          <i data-lucide="play"></i>
+          <span data-i18n="compare">Compare</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="settings">Settings</h3>
+        <button class="btn btn-icon btn-ghost" onclick="closeSettings()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" data-i18n="language">Language</label>
+          <select id="settings-language" class="select" style="width: 100%;" onchange="changeLanguage(this.value)">
+            <!-- Languages will be populated by JS -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="customModel">Custom Model</label>
+          <div class="flex gap-2">
+            <input type="text" id="custom-model-input" class="form-input" placeholder="openrouter:model/name">
+            <button class="btn btn-primary" onclick="addCustomModel()">
+              <i data-lucide="plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">MCP Tools</label>
+          <div id="mcp-tools-list">
+            <!-- MCP tools will be listed here -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeSettings()" data-i18n="close">Close</button>
+        <button class="btn btn-primary" onclick="saveSettings()" data-i18n="confirm">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Gallery Modal -->
+  <div class="modal-overlay" id="gallery-modal">
+    <div class="modal" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="imageGallery">Image Gallery</h3>
+        <button class="btn btn-icon btn-ghost" onclick="closeImageGallery()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="gallery-grid" class="gallery-grid">
+          <!-- Images will be populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New File Modal -->
+  <div class="modal-overlay" id="new-file-modal">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="newFile">New File</h3>
+        <button class="btn btn-icon btn-ghost" onclick="closeNewFileModal()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" data-i18n="fileName">File Name</label>
+          <input type="text" id="new-file-name" class="form-input" placeholder="filename.js">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeNewFileModal()" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmNewFile()" data-i18n="confirm">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Project Modal -->
+  <div class="modal-overlay" id="new-project-modal">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="newProject">New Project</h3>
+        <button class="btn btn-icon btn-ghost" onclick="closeNewProjectModal()">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" data-i18n="projectName">Project Name</label>
+          <input type="text" id="new-project-name" class="form-input" placeholder="my-project">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeNewProjectModal()" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmNewProject()" data-i18n="confirm">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="languages.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
