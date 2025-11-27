@@ -164,8 +164,9 @@ Complete the code naturally. Output only the completion:`;
         let cleaned = response.trim();
 
         // Eğer mevcut satır içeriğini tekrar ediyorsa, kaldır
-        if (cleaned.startsWith(context.linePrefix.trim())) {
-            cleaned = cleaned.substring(context.linePrefix.trim().length);
+        const linePrefixTrimmed = context.linePrefix.trim();
+        if (cleaned.startsWith(linePrefixTrimmed)) {
+            cleaned = cleaned.substring(linePrefixTrimmed.length);
         }
 
         // Kod bloğu işaretlerini kaldır

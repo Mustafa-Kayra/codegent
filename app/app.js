@@ -642,7 +642,9 @@ function updatePreview() {
             if (filename.endsWith('.css')) {
                 const cssContent = files[filename].content;
                 // <link> tag'ını <style> ile değiştir
-                const linkTag = new RegExp(`<link[^>]*href=["']${filename}["'][^>]*>`, 'gi');
+                // Escape special regex characters in filename to prevent ReDoS
+                const escapedFilename = filename.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const linkTag = new RegExp(`<link[^>]*href=["']${escapedFilename}["'][^>]*>`, 'gi');
                 htmlContent = htmlContent.replace(linkTag, `<style>${cssContent}</style>`);
                 
                 // Eğer link tag'ı yoksa, head'e ekle
@@ -657,7 +659,9 @@ function updatePreview() {
             if (filename.endsWith('.js') && filename !== 'app.js') {
                 const jsContent = files[filename].content;
                 // <script src> tag'ını inline script ile değiştir
-                const scriptTag = new RegExp(`<script[^>]*src=["']${filename}["'][^>]*></script>`, 'gi');
+                // Escape special regex characters in filename to prevent ReDoS
+                const escapedFilename = filename.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const scriptTag = new RegExp(`<script[^>]*src=["']${escapedFilename}["'][^>]*></script>`, 'gi');
                 htmlContent = htmlContent.replace(scriptTag, `<script>${jsContent}</script>`);
                 
                 // Eğer script tag'ı yoksa, body sonuna ekle
@@ -920,7 +924,10 @@ async function deployProject() {
             throw new Error('Puter API mevcut değil');
         }
         
-        const randomId = Math.random().toString(36).substring(7);
+        // Use crypto for secure random ID generation
+        const randomArray = new Uint32Array(2);
+        crypto.getRandomValues(randomArray);
+        const randomId = Array.from(randomArray).map(n => n.toString(36)).join('').substring(0, 10);
         const subdomain = `codegent-${randomId}`;
         const dir = `codegent_${randomId}`;
         

@@ -146,9 +146,11 @@ export class ContextService {
         const functionRegex = /(function|class|const|let|var)\s+(\w+)/g;
         let lastMatch: RegExpExecArray | null = null;
         
-        while ((match = functionRegex.exec(text)) !== null) {
-            if (match.index < offset) {
-                lastMatch = match;
+        // Use matchAll to avoid potential infinite loop with global regex
+        const matches = text.matchAll(functionRegex);
+        for (const matchItem of matches) {
+            if (matchItem.index !== undefined && matchItem.index < offset) {
+                lastMatch = matchItem;
             } else {
                 break;
             }
