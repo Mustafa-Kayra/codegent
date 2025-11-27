@@ -99,6 +99,7 @@ app/
 - [Monaco Editor](https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/) - Code editor
 - [Lucide Icons](https://unpkg.com/lucide@latest) - Icons
 - [Marked](https://cdn.jsdelivr.net/npm/marked/) - Markdown parser
+- [DOMPurify](https://cdn.jsdelivr.net/npm/dompurify/) - XSS sanitization
 - [Inter Font](https://fonts.googleapis.com/css2?family=Inter) - UI font
 - [Fira Code](https://fonts.googleapis.com/css2?family=Fira+Code) - Code font
 

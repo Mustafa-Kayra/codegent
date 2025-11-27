@@ -819,7 +819,7 @@ function addChatMessage(role, content, model = null) {
   if (role === 'user') {
     messageEl.innerHTML = `<div class="message-content">${escapeHtml(content)}</div>`;
   } else {
-    const parsedContent = marked.parse(content);
+    const parsedContent = sanitizeMarkdown(content);
     messageEl.innerHTML = `
       <div class="message-avatar">
         <i data-lucide="bot" style="width: 18px; height: 18px; color: white;"></i>
@@ -881,7 +881,7 @@ function renderChatMessages() {
     if (msg.role === 'user') {
       messageEl.innerHTML = `<div class="message-content">${escapeHtml(msg.content)}</div>`;
     } else {
-      const parsedContent = marked.parse(msg.content);
+      const parsedContent = sanitizeMarkdown(msg.content);
       messageEl.innerHTML = `
         <div class="message-avatar">
           <i data-lucide="bot" style="width: 18px; height: 18px; color: white;"></i>
@@ -967,8 +967,8 @@ async function runComparison() {
       callAI(prompt, model2)
     ]);
     
-    result1.innerHTML = marked.parse(response1);
-    result2.innerHTML = marked.parse(response2);
+    result1.innerHTML = sanitizeMarkdown(response1);
+    result2.innerHTML = sanitizeMarkdown(response2);
   } catch (e) {
     result1.innerHTML = '<p class="text-muted">Error loading response</p>';
     result2.innerHTML = '<p class="text-muted">Error loading response</p>';
@@ -1169,8 +1169,8 @@ function renderMCPTools() {
     <div class="file-item" style="cursor: default;">
       <i data-lucide="wrench"></i>
       <div>
-        <strong>${tool.name}</strong>
-        <p class="text-xs text-muted">${tool.description}</p>
+        <strong>${escapeHtml(tool.name)}</strong>
+        <p class="text-xs text-muted">${escapeHtml(tool.description)}</p>
       </div>
     </div>
   `).join('');
@@ -1201,7 +1201,7 @@ function showToast(message, type = 'info') {
   toast.className = `toast ${type}`;
   toast.innerHTML = `
     <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : type === 'warning' ? 'alert-triangle' : 'info'}"></i>
-    <span>${message}</span>
+    <span>${escapeHtml(message)}</span>
   `;
   
   container.appendChild(toast);
@@ -1217,6 +1217,18 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Sanitize markdown output to prevent XSS
+function sanitizeMarkdown(markdown) {
+  const html = marked.parse(markdown);
+  if (typeof DOMPurify !== 'undefined') {
+    return DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'code', 'pre', 'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'span', 'div'],
+      ALLOWED_ATTR: ['href', 'class', 'target', 'rel']
+    });
+  }
+  return html;
 }
 
 function setupEventListeners() {
