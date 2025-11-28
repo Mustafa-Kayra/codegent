@@ -623,13 +623,13 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       const messageEl = document.createElement('div');
       messageEl.className = 'message ' + role;
       
-      // Parse code blocks
-      let parsedContent = content;
+      // Parse code blocks - escape content first for security
+      let parsedContent = escapeHtml(content);
       const codeBlocks = [];
       parsedContent = parsedContent.replace(/\`\`\`(\\w*)\\n([\\s\\S]*?)\`\`\`/g, (match, lang, code) => {
         const id = 'code-' + Date.now() + '-' + codeBlocks.length;
         codeBlocks.push({ id, code: code.trim() });
-        return '<pre><code>' + escapeHtml(code.trim()) + '</code></pre>' +
+        return '<pre><code>' + code.trim() + '</code></pre>' +
                '<div class="code-actions">' +
                '<button class="code-btn" onclick="copyCode(\\'' + id + '\\')">Copy</button>' +
                '<button class="code-btn" onclick="insertCode(\\'' + id + '\\')">Insert</button>' +
@@ -637,7 +637,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
                '<script>window.codeBlocks = window.codeBlocks || {}; window.codeBlocks[\\'' + id + '\\'] = ' + JSON.stringify(code.trim()) + ';<\\/script>';
       });
       
-      // Parse inline code
+      // Parse inline code (already escaped)
       parsedContent = parsedContent.replace(/\`([^\`]+)\`/g, '<code>$1</code>');
       
       // Parse newlines
@@ -651,7 +651,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         (role === 'assistant' && model ? 
           '<div class="regenerate-section">' +
           '<select class="model-select" id="regen-model">' +
-          models.map(m => '<option value="' + m.id + '"' + (m.id === model ? ' selected' : '') + '>' + m.name + '</option>').join('') +
+          models.map(m => '<option value="' + escapeHtml(m.id) + '"' + (m.id === model ? ' selected' : '') + '>' + escapeHtml(m.name) + '</option>').join('') +
           '</select>' +
           '<button class="code-btn" onclick="regenerate()">🔄 Regenerate</button>' +
           '</div>' : '') +

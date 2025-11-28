@@ -4,6 +4,15 @@
  */
 
 /* ============================================
+   Configuration Constants
+============================================ */
+const CONFIG = {
+  PUTER_INIT_TIMEOUT_MS: 3000,  // 3 second timeout for Puter SDK initialization
+  DEBOUNCE_DELAY_MS: 500,       // Debounce delay for preview updates
+  TOAST_DURATION_MS: 3000       // Toast notification duration
+};
+
+/* ============================================
    AI Models Configuration (33 Models)
 ============================================ */
 const AI_MODELS = [
@@ -71,7 +80,7 @@ let projectFiles = [];
 let currentFile = null;
 
 /* ============================================
-   Puter Initialization (3 second timeout)
+   Puter Initialization (with configurable timeout)
 ============================================ */
 async function initPuter() {
   return new Promise((resolve) => {
@@ -79,7 +88,7 @@ async function initPuter() {
       console.warn('⚠️ Puter SDK timeout, Guest Mode activated');
       puterReady = false;
       resolve(false);
-    }, 3000);
+    }, CONFIG.PUTER_INIT_TIMEOUT_MS);
 
     if (typeof puter !== 'undefined') {
       clearTimeout(timeout);
@@ -980,12 +989,18 @@ function showToast(message, type = 'info') {
   setTimeout(() => {
     toast.style.opacity = '0';
     setTimeout(() => toast.remove(), 300);
-  }, 3000);
+  }, CONFIG.TOAST_DURATION_MS);
 }
 
 /* ============================================
    Utility Functions
 ============================================ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -1076,8 +1091,8 @@ async function initApp() {
   const modelSelect = document.getElementById('model-select');
   if (modelSelect) {
     modelSelect.innerHTML = AI_MODELS.map(m => `
-      <option value="${m.id}" ${m.id === selectedModel ? 'selected' : ''}>
-        ${m.name} (${m.provider})
+      <option value="${escapeHtml(m.id)}" ${m.id === selectedModel ? 'selected' : ''}>
+        ${escapeHtml(m.name)} (${escapeHtml(m.provider)})
       </option>
     `).join('');
     

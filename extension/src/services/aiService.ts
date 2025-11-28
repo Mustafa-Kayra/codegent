@@ -226,15 +226,25 @@ export class AIService {
         ]
       : prompt;
 
-    // For VS Code extension, we'll use a mock response in development
-    // In production, this would call the actual Puter API
+    /**
+     * MOCK IMPLEMENTATION FOR DEVELOPMENT
+     * 
+     * This is a temporary mock implementation that simulates AI responses.
+     * In production, this should be replaced with actual API calls to:
+     * - Puter API (https://api.puter.com) for hosted AI services
+     * - Or direct API calls to OpenAI, Anthropic, etc.
+     * 
+     * To implement real API calls:
+     * 1. Add axios as a dependency: npm install axios
+     * 2. Use axios to make HTTP requests to the AI provider
+     * 3. Handle authentication tokens from the Puter SDK
+     */
     
-    // Simulate API call
+    // Simulate API call with mock responses
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        // Check if we have axios for real API calls
         try {
-          // For now, return a helpful mock response
+          // Return a helpful mock response based on the user's query
           const userMessage = messages.find(m => m.role === 'user')?.content || '';
           
           if (userMessage.toLowerCase().includes('explain')) {
