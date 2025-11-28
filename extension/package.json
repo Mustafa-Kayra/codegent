@@ -1,0 +1,256 @@
+{
+  "name": "codegent-ai-agent",
+  "displayName": "Codegent AI Agent",
+  "description": "AI-powered code completion and chat - GitHub Copilot alternative with 33+ AI models",
+  "version": "1.0.0",
+  "publisher": "mustafa-kayra",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mustafa-Kayra/codegent"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Programming Languages",
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "copilot",
+    "autocomplete",
+    "code completion",
+    "chat",
+    "gpt",
+    "claude",
+    "gemini",
+    "llama"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codegent.openChat",
+        "title": "Codegent: Open Chat",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "codegent.explainCode",
+        "title": "Codegent: Explain Code",
+        "icon": "$(question)"
+      },
+      {
+        "command": "codegent.refactorCode",
+        "title": "Codegent: Refactor Code",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "codegent.fixCode",
+        "title": "Codegent: Fix Code",
+        "icon": "$(debug-restart)"
+      },
+      {
+        "command": "codegent.generateTests",
+        "title": "Codegent: Generate Tests",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "codegent.addComments",
+        "title": "Codegent: Add Comments",
+        "icon": "$(comment)"
+      },
+      {
+        "command": "codegent.signIn",
+        "title": "Codegent: Sign In",
+        "icon": "$(sign-in)"
+      },
+      {
+        "command": "codegent.signOut",
+        "title": "Codegent: Sign Out",
+        "icon": "$(sign-out)"
+      },
+      {
+        "command": "codegent.selectModel",
+        "title": "Codegent: Select AI Model",
+        "icon": "$(symbol-misc)"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "codegentChat",
+          "name": "AI Agent Chat",
+          "type": "webview"
+        }
+      ]
+    },
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "codegent.submenu",
+          "group": "codegent"
+        }
+      ],
+      "codegent.submenu": [
+        {
+          "command": "codegent.explainCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codegent.refactorCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codegent.fixCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codegent.generateTests",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codegent.addComments",
+          "when": "editorHasSelection"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codegent.openChat"
+        },
+        {
+          "command": "codegent.explainCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codegent.refactorCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codegent.fixCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codegent.generateTests",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codegent.addComments",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codegent.signIn"
+        },
+        {
+          "command": "codegent.signOut"
+        },
+        {
+          "command": "codegent.selectModel"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "codegent.submenu",
+        "label": "Codegent AI"
+      }
+    ],
+    "configuration": {
+      "title": "Codegent AI Agent",
+      "properties": {
+        "codegent.enableInlineCompletion": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable inline code completion suggestions"
+        },
+        "codegent.defaultModel": {
+          "type": "string",
+          "default": "gpt-4o",
+          "enum": [
+            "gpt-4o",
+            "gpt-4o-mini",
+            "gpt-4-turbo",
+            "gpt-4",
+            "gpt-3.5-turbo",
+            "claude-3-5-sonnet",
+            "claude-3-5-haiku",
+            "claude-3-opus",
+            "gemini-2.0-flash",
+            "gemini-1.5-pro",
+            "gemini-1.5-flash",
+            "llama-3.3-70b",
+            "llama-3.1-70b",
+            "mistral-large",
+            "codestral",
+            "deepseek-chat",
+            "deepseek-reasoner",
+            "qwen-2.5-coder-32b"
+          ],
+          "description": "Default AI model for completions and chat"
+        },
+        "codegent.completionDebounce": {
+          "type": "number",
+          "default": 300,
+          "minimum": 100,
+          "maximum": 2000,
+          "description": "Debounce delay in milliseconds for inline completions"
+        },
+        "codegent.maxTokens": {
+          "type": "number",
+          "default": 2048,
+          "minimum": 256,
+          "maximum": 8192,
+          "description": "Maximum tokens for AI responses"
+        },
+        "codegent.contextLines": {
+          "type": "number",
+          "default": 100,
+          "minimum": 10,
+          "maximum": 500,
+          "description": "Number of context lines to send for completions"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "codegent.openChat",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      },
+      {
+        "command": "codegent.explainCode",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "editorHasSelection"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "webpack --mode production",
+    "watch": "webpack --mode development --watch",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "axios": "^1.6.2"
+  }
+}
