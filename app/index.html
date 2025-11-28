@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codegent AI Agent</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2358a6ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5z'/%3E%3Cpath d='M2 17l10 5 10-5'/%3E%3Cpath d='M2 12l10 5 10-5'/%3E%3C/svg%3E">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  
+  <!-- Marked.js for Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <!-- Monaco Editor -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+  
+  <!-- Puter.js SDK -->
+  <script src="https://js.puter.com/v2/"></script>
+  
+  <!-- Languages -->
+  <script src="languages.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="app-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span data-i18n="appTitle">Codegent AI Agent</span>
+      </div>
+      
+      <div class="header-actions">
+        <div class="model-selector">
+          <select id="model-select" class="model-select">
+            <!-- Populated by JavaScript -->
+          </select>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="openComparePanel()">
+          <i data-lucide="columns"></i>
+          <span data-i18n="compare">Compare</span>
+        </button>
+        
+        <button class="btn btn-success" onclick="deployProject()">
+          <i data-lucide="rocket"></i>
+          <span data-i18n="deploy">Deploy</span>
+        </button>
+        
+        <button class="btn-icon" onclick="openSettings()" title="Settings">
+          <i data-lucide="settings"></i>
+        </button>
+        
+        <div id="user-status" class="user-status guest">
+          <span class="user-status-dot"></span>
+          <span data-i18n="guestMode">Guest Mode</span>
+        </div>
+        
+        <button id="auth-btn" class="btn btn-primary" onclick="isUserSignedIn ? signOut() : signIn()">
+          <i data-lucide="log-in"></i>
+          <span data-i18n="signIn">Sign In</span>
+        </button>
+      </div>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Left Panel - File Explorer -->
+      <aside class="file-explorer">
+        <div class="file-explorer-header">
+          <h3 data-i18n="files">Files</h3>
+          <div class="file-explorer-actions">
+            <button class="btn-icon" onclick="createNewFile()" title="New File">
+              <i data-lucide="file-plus"></i>
+            </button>
+            <button class="btn-icon" onclick="saveCurrentFile()" title="Save">
+              <i data-lucide="save"></i>
+            </button>
+          </div>
+        </div>
+        <div id="file-tree" class="file-tree">
+          <!-- Populated by JavaScript -->
+        </div>
+      </aside>
+      
+      <!-- Center Panel - Editor -->
+      <main class="editor-panel">
+        <div id="editor-tabs" class="editor-tabs">
+          <!-- Populated by JavaScript -->
+        </div>
+        <div class="editor-container">
+          <div id="monaco-editor"></div>
+        </div>
+      </main>
+      
+      <!-- Right Panel - Preview -->
+      <aside class="preview-panel">
+        <div class="preview-header">
+          <h3 data-i18n="preview">Preview</h3>
+          <div class="preview-actions">
+            <button class="btn-icon" onclick="updatePreview()" title="Refresh">
+              <i data-lucide="refresh-cw"></i>
+            </button>
+            <button class="btn-icon" onclick="window.open(document.getElementById('preview-frame').srcdoc, '_blank')" title="Open in new tab">
+              <i data-lucide="external-link"></i>
+            </button>
+          </div>
+        </div>
+        <iframe id="preview-frame" class="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+      </aside>
+    </div>
+    
+    <!-- Bottom Panel - Chat -->
+    <section class="chat-panel">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <h3 data-i18n="chat">AI Chat</h3>
+          <span id="sync-status" class="text-xs text-gray-500"></span>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn-icon" onclick="clearChat()" title="Clear chat">
+            <i data-lucide="trash-2"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div id="chat-messages" class="chat-messages">
+        <!-- Chat messages populated by JavaScript -->
+      </div>
+      
+      <div class="chat-input-container">
+        <textarea 
+          id="chat-input" 
+          class="chat-input" 
+          rows="2"
+          data-i18n-placeholder="typeMessage"
+          placeholder="Type your message..."
+          onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendChatMessage(); }">
+        </textarea>
+        <button class="btn btn-primary" onclick="sendChatMessage()">
+          <i data-lucide="send"></i>
+          <span data-i18n="send">Send</span>
+        </button>
+      </div>
+    </section>
+    
+    <!-- Status Bar -->
+    <footer class="status-bar">
+      <div class="status-bar-left">
+        <span class="status-item">
+          <i data-lucide="code" style="width:14px;height:14px"></i>
+          Codegent v1.0
+        </span>
+      </div>
+      <div class="status-bar-right">
+        <span class="status-item" id="current-language">JavaScript</span>
+        <span class="status-item">UTF-8</span>
+      </div>
+    </footer>
+  </div>
+  
+  <!-- Modal Overlay -->
+  <div id="modal-overlay" class="modal-overlay" onclick="closeSettings(); closeComparePanel(); closeDeployDialog();"></div>
+  
+  <!-- Settings Panel -->
+  <div id="settings-panel" class="settings-panel">
+    <div class="settings-header">
+      <h2 data-i18n="settings">Settings</h2>
+      <button class="btn-icon" onclick="closeSettings()">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="settings-content">
+      <div class="settings-group">
+        <h3 data-i18n="language">Language</h3>
+        <div class="settings-item">
+          <span class="settings-label" data-i18n="language">Interface Language</span>
+          <select id="language-select" class="settings-select" onchange="changeLanguage(this.value)">
+            <!-- Populated by JavaScript -->
+          </select>
+        </div>
+      </div>
+      
+      <div class="settings-group">
+        <h3 data-i18n="models">Models</h3>
+        <div class="settings-item">
+          <span class="settings-label">Default AI Model</span>
+          <select id="default-model-select" class="settings-select" onchange="changeDefaultModel(this.value)">
+            <!-- Populated by JavaScript -->
+          </select>
+        </div>
+      </div>
+      
+      <div class="settings-group">
+        <h3>Account</h3>
+        <div class="settings-item">
+          <span class="settings-label">Storage</span>
+          <span id="storage-status" class="text-sm text-gray-400">Local Storage</span>
+        </div>
+        <div class="settings-item">
+          <span class="settings-label">Authentication</span>
+          <button id="settings-auth-btn" class="btn btn-sm btn-secondary" onclick="isUserSignedIn ? signOut() : signIn()">
+            <span data-i18n="signIn">Sign In</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Compare Panel (Side by Side) -->
+  <div id="compare-panel" class="compare-panel">
+    <div class="compare-header">
+      <h2 data-i18n="compare">Compare Models</h2>
+      <button class="btn-icon" onclick="closeComparePanel()">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="p-4 border-b border-gray-700">
+      <textarea 
+        id="compare-input" 
+        class="chat-input w-full" 
+        rows="3" 
+        placeholder="Enter your prompt to compare..."></textarea>
+      <button class="btn btn-primary mt-2" onclick="runComparison()">
+        <i data-lucide="play"></i>
+        Run Comparison
+      </button>
+    </div>
+    <div class="compare-content">
+      <div class="compare-column">
+        <div class="compare-column-header">
+          <span>Model 1</span>
+          <select id="compare-model-1" class="model-select">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div id="compare-result-1" class="compare-result">
+          <span class="text-gray-500">Results will appear here...</span>
+        </div>
+      </div>
+      <div class="compare-column">
+        <div class="compare-column-header">
+          <span>Model 2</span>
+          <select id="compare-model-2" class="model-select">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div id="compare-result-2" class="compare-result">
+          <span class="text-gray-500">Results will appear here...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Deploy Success Dialog -->
+  <div id="deploy-dialog" class="deploy-dialog">
+    <div class="deploy-dialog-header">
+      <h2>🚀 <span data-i18n="deploySuccess">Deployed Successfully!</span></h2>
+      <button class="btn-icon" onclick="closeDeployDialog()">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="deploy-dialog-content">
+      <p class="text-gray-400 mb-4">Your project is now live at:</p>
+      <div class="deploy-url">
+        <input type="text" id="deploy-url-input" readonly>
+        <button class="btn-icon" onclick="copyDeployUrl()" title="Copy URL">
+          <i data-lucide="copy"></i>
+        </button>
+        <button class="btn-icon" onclick="openDeployUrl()" title="Open URL">
+          <i data-lucide="external-link"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+  
+  <!-- Main Application Script -->
+  <script src="app.js"></script>
+  
+  <!-- Initialize Compare Panel Model Selects -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Populate compare model selects
+      const models = [
+        { id: 'gpt-4o', name: 'GPT-4o', provider: 'OpenAI' },
+        { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'OpenAI' },
+        { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'Anthropic' },
+        { id: 'claude-3-5-haiku', name: 'Claude 3.5 Haiku', provider: 'Anthropic' },
+        { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', provider: 'Google' },
+        { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', provider: 'Google' },
+        { id: 'llama-3.3-70b', name: 'Llama 3.3 70B', provider: 'Meta' },
+        { id: 'mistral-large', name: 'Mistral Large', provider: 'Mistral' },
+        { id: 'deepseek-chat', name: 'DeepSeek Chat', provider: 'DeepSeek' },
+        { id: 'qwen-2.5-72b', name: 'Qwen 2.5 72B', provider: 'Alibaba' }
+      ];
+      
+      const select1 = document.getElementById('compare-model-1');
+      const select2 = document.getElementById('compare-model-2');
+      
+      if (select1 && select2) {
+        const options = models.map(m => `<option value="${m.id}">${m.name} (${m.provider})</option>`).join('');
+        select1.innerHTML = options;
+        select2.innerHTML = options;
+        select2.selectedIndex = 2; // Default to Claude for comparison
+      }
+    });
+  </script>
+</body>
+</html>
